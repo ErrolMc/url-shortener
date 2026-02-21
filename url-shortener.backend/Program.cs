@@ -8,26 +8,32 @@ public class Program
         var builder = WebApplication.CreateBuilder(args);
         builder.AddServiceDefaults();
 
-        // Add services to the container.
+        var corsOrigins = builder.Configuration["CORS_ORIGINS"]
+            ?.Split(',', StringSplitOptions.RemoveEmptyEntries)
+            ?? [];
+
+        builder.Services.AddCors(options =>
+        {
+            options.AddDefaultPolicy(policy =>
+                policy.WithOrigins(corsOrigins)
+                      .AllowAnyHeader()
+                      .AllowAnyMethod());
+        });
 
         builder.Services.AddControllers();
-        // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
         builder.Services.AddOpenApi();
 
         var app = builder.Build();
 
         app.MapDefaultEndpoints();
 
-        // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
         {
             app.MapOpenApi();
         }
 
-        app.UseHttpsRedirection();
-
+        app.UseCors();
         app.UseAuthorization();
-
 
         app.MapControllers();
 
