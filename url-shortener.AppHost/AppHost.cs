@@ -6,6 +6,7 @@ var cosmos = builder.AddAzureCosmosDB("cosmos")
 var googleClientId = builder.Configuration["Google:ClientId"] ?? "";
 var googleClientSecret = builder.Configuration["Google:ClientSecret"] ?? "";
 var nextAuthSecret = builder.Configuration["NextAuth:Secret"] ?? "";
+var nextAuthUrl = builder.Configuration["NextAuth:Url"] ?? "http://localhost:3000";
 var jwtSecret = builder.Configuration["Jwt:Secret"] ?? "";
 
 var backend = builder.AddProject<Projects.url_shortener_backend>("url-shortener-backend")
@@ -24,7 +25,7 @@ var frontend = builder.AddDockerfile("frontend", "../url-shortner.frontend")
     .WithEnvironment("GOOGLE_CLIENT_ID", googleClientId)
     .WithEnvironment("GOOGLE_CLIENT_SECRET", googleClientSecret)
     .WithEnvironment("NEXTAUTH_SECRET", nextAuthSecret)
-    .WithEnvironment("NEXTAUTH_URL", "http://localhost:3000");
+    .WithEnvironment("NEXTAUTH_URL", nextAuthUrl);
 
 backend.WithEnvironment("CORS_ORIGINS", frontend.GetEndpoint("http"));
 
