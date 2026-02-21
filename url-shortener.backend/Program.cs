@@ -17,6 +17,8 @@ public class Program
         builder.Services.AddSingleton<IUserRepository, UserRepository>();
         builder.Services.AddSingleton<IUrlRepository, UrlRepository>();
         builder.Services.AddSingleton<ICodeGenerationService, CodeGenerationService>();
+        builder.Services.AddSingleton<IAnalyticsRepository, AnalyticsRepository>();
+        builder.Services.AddSingleton<IAnalyticsService, AnalyticsService>();
 
         string[]? corsOrigins = builder.Configuration["CORS_ORIGINS"]
             ?.Split(',', StringSplitOptions.RemoveEmptyEntries)

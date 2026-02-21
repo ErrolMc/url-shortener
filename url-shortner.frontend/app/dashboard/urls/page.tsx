@@ -69,14 +69,16 @@ export default function UrlsPage() {
     }
   };
 
+  const urlDomain = process.env.NEXT_PUBLIC_URL_DOMAIN;
+
+  const getShortUrl = (shortCode: string) =>
+    `${urlDomain}/${shortCode}`;
+
   const handleCopy = async (shortCode: string, id: string) => {
-    await navigator.clipboard.writeText(`${window.location.origin}/r/${shortCode}`);
+    await navigator.clipboard.writeText(getShortUrl(shortCode));
     setCopiedId(id);
     setTimeout(() => setCopiedId(null), 2000);
   };
-
-  const getShortUrl = (shortCode: string) =>
-    `${window.location.origin}/r/${shortCode}`;
 
   return (
     <div className="max-w-3xl space-y-8">
