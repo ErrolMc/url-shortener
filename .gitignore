@@ -31,6 +31,7 @@ TestResults/
 # Node / Next.js
 # ------------------------------
 **/node_modules/
+**/package-lock.json
 **/.pnp
 **/.pnp.*
 **/.yarn/*
@@ -58,3 +59,10 @@ yarn-error.log*
 # ------------------------------
 .env*
 !.env.example
+
+# ------------------------------
+# Secrets / local config
+# ------------------------------
+url-shortener.AppHost/appsettings.Development.json
+url-shortener.backend/appsettings.Development.json
+.claude/settings.local.json

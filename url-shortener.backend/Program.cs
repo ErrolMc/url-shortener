@@ -1,3 +1,7 @@
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using url_shortener.backend.Repositories;
 
 namespace url_shortener.backend;
 
@@ -7,6 +11,8 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
         builder.AddServiceDefaults();
+        builder.AddAzureCosmosClient("cosmos");
+        builder.Services.AddSingleton<IUserRepository, UserRepository>();
 
         var corsOrigins = builder.Configuration["CORS_ORIGINS"]
             ?.Split(',', StringSplitOptions.RemoveEmptyEntries)
@@ -19,6 +25,22 @@ public class Program
                       .AllowAnyHeader()
                       .AllowAnyMethod());
         });
+
+        var jwtSecret = builder.Configuration["Jwt:Secret"]
+            ?? throw new InvalidOperationException("Jwt:Secret is not configured");
+        builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecret)),
+                    ValidateIssuer = true,
+                    ValidIssuer = builder.Configuration["Jwt:Issuer"] ?? "url-shortener-backend",
+                    ValidateAudience = true,
+                    ValidAudience = builder.Configuration["Jwt:Audience"] ?? "url-shortener-frontend",
+                };
+            });
 
         builder.Services.AddControllers();
         builder.Services.AddOpenApi();
@@ -33,6 +55,7 @@ public class Program
         }
 
         app.UseCors();
+        app.UseAuthentication();
         app.UseAuthorization();
 
         app.MapControllers();
