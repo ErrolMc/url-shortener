@@ -2,6 +2,8 @@ using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using url_shortener.backend.Repositories;
+using url_shortener.backend.Services;
+using url_shortener.backend.Services.Concrete;
 
 namespace url_shortener.backend;
 
@@ -13,8 +15,10 @@ public class Program
         builder.AddServiceDefaults();
         builder.AddAzureCosmosClient("cosmos");
         builder.Services.AddSingleton<IUserRepository, UserRepository>();
+        builder.Services.AddSingleton<IUrlRepository, UrlRepository>();
+        builder.Services.AddSingleton<ICodeGenerationService, CodeGenerationService>();
 
-        var corsOrigins = builder.Configuration["CORS_ORIGINS"]
+        string[]? corsOrigins = builder.Configuration["CORS_ORIGINS"]
             ?.Split(',', StringSplitOptions.RemoveEmptyEntries)
             ?? [];
 
@@ -31,6 +35,7 @@ public class Program
         builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(options =>
             {
+                options.MapInboundClaims = false;
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuerSigningKey = true,
