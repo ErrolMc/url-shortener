@@ -1,0 +1,60 @@
+# ------------------------------
+# OS artifacts
+# ------------------------------
+.DS_Store
+Thumbs.db
+
+# ------------------------------
+# IDE / Editor
+# ------------------------------
+.vs/
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# ------------------------------
+# .NET / C# build outputs
+# ------------------------------
+**/bin/
+**/obj/
+TestResults/
+*.nupkg
+*.snupkg
+
+# ------------------------------
+# Node / Next.js
+# ------------------------------
+**/node_modules/
+**/.pnp
+**/.pnp.*
+**/.yarn/*
+!**/.yarn/patches
+!**/.yarn/plugins
+!**/.yarn/releases
+!**/.yarn/versions
+**/.next/
+**/out/
+**/build/
+**/coverage/
+**/.vercel/
+*.tsbuildinfo
+
+# ------------------------------
+# Logs
+# ------------------------------
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# ------------------------------
+# Environment files
+# ------------------------------
+.env*
+!.env.example
