@@ -17,11 +17,13 @@ public class URLController : ControllerBase
 
     private readonly IUrlRepository _urls;
     private readonly ICodeGenerationService _codeGen;
+    private readonly IAnalyticsRepository _analytics;
 
-    public URLController(IUrlRepository urls, ICodeGenerationService codeGen)
+    public URLController(IUrlRepository urls, ICodeGenerationService codeGen, IAnalyticsRepository analytics)
     {
         _urls = urls;
         _codeGen = codeGen;
+        _analytics = analytics;
     }
 
     [HttpGet]
@@ -82,7 +84,8 @@ public class URLController : ControllerBase
         var userId = User.FindFirstValue(JwtRegisteredClaimNames.Sub);
         if (userId is null) return Unauthorized();
 
-        await _urls.DeleteAsync(id, userId);
+        var deleted = await _urls.DeleteAsync(id, userId);
+        await _analytics.DeleteByShortCodeAsync(deleted.ShortCode);
         return NoContent();
     }
 }

@@ -1,13 +1,7 @@
 using Microsoft.Azure.Cosmos;
 using url_shortener.backend.Models;
 
-namespace url_shortener.backend.Repositories;
-
-public interface IAnalyticsRepository
-{
-    Task RecordAsync(AnalyticEvent evt);
-    Task<IEnumerable<AnalyticEvent>> GetByShortCodeAsync(string shortCode);
-}
+namespace url_shortener.backend.Repositories.Concrete;
 
 public class AnalyticsRepository : IAnalyticsRepository
 {
@@ -50,5 +44,26 @@ public class AnalyticsRepository : IAnalyticsRepository
         }
 
         return results;
+    }
+
+    public async Task DeleteByShortCodeAsync(string shortCode)
+    {
+        var container = await _containerTask;
+        var query = new QueryDefinition("SELECT c.id FROM c WHERE c.shortCode = @shortCode")
+            .WithParameter("@shortCode", shortCode);
+
+        var ids = new List<string>();
+        using var feed = container.GetItemQueryIterator<AnalyticEvent>(query,
+            requestOptions: new QueryRequestOptions { PartitionKey = new PartitionKey(shortCode) });
+
+        while (feed.HasMoreResults)
+        {
+            var batch = await feed.ReadNextAsync();
+            ids.AddRange(batch.Select(e => e.Id));
+        }
+
+        var pk = new PartitionKey(shortCode);
+        var deleteTasks = ids.Select(id => container.DeleteItemAsync<AnalyticEvent>(id, pk));
+        await Task.WhenAll(deleteTasks);
     }
 }

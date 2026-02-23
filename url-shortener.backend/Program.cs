@@ -1,6 +1,7 @@
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using url_shortener.backend.Repositories.Concrete;
 using url_shortener.backend.Repositories;
 using url_shortener.backend.Services;
 using url_shortener.backend.Services.Concrete;

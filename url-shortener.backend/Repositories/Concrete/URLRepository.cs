@@ -1,15 +1,7 @@
 using Microsoft.Azure.Cosmos;
 using url_shortener.backend.Models;
 
-namespace url_shortener.backend.Repositories;
-
-public interface IUrlRepository
-{
-    Task<IEnumerable<ShortenedUrl>> GetByUserAsync(string userId);
-    Task<ShortenedUrl> CreateAsync(ShortenedUrl url);
-    Task DeleteAsync(string id, string userId);
-    Task<ShortenedUrl?> GetByShortCodeAsync(string shortCode);
-}
+namespace url_shortener.backend.Repositories.Concrete;
 
 public class UrlRepository : IUrlRepository
 {
@@ -54,10 +46,13 @@ public class UrlRepository : IUrlRepository
         return response.Resource;
     }
 
-    public async Task DeleteAsync(string id, string userId)
+    public async Task<ShortenedUrl> DeleteAsync(string id, string userId)
     {
         var container = await _containerTask;
-        await container.DeleteItemAsync<ShortenedUrl>(id, new PartitionKey(userId));
+        var pk = new PartitionKey(userId);
+        var read = await container.ReadItemAsync<ShortenedUrl>(id, pk);
+        await container.DeleteItemAsync<ShortenedUrl>(id, pk);
+        return read.Resource;
     }
 
     public async Task<ShortenedUrl?> GetByShortCodeAsync(string shortCode)
