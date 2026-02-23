@@ -1,6 +1,6 @@
 # URL Shortener
 
-A full-stack URL shortener with analytics, built with .NET 10, Next.js 16, and Azure Cosmos DB — orchestrated via .NET Aspire and deployable to Azure Container Apps.
+A full-stack URL shortener with click analytics, built with .NET 10, Next.js 16, and Azure Cosmos DB. The backend exposes a minimal REST API secured with Google OAuth and JWT, while the frontend provides a dashboard for managing links and exploring traffic data. The project is orchestrated locally with .NET Aspire and deploys to Azure Container Apps using the Azure Developer CLI.
 
 ## Features
 
