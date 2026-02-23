@@ -2,6 +2,7 @@ import type { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 
 const backendUrl =
+  process.env["services__url-shortener-backend__https__0"] ??
   process.env["services__url-shortener-backend__http__0"] ??
   "http://localhost:5112";
 

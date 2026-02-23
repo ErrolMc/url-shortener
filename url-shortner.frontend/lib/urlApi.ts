@@ -1,4 +1,4 @@
-import { apiFetch, backendUrl } from "./api";
+import { apiFetch, urlApiBase } from "./api";
 
 export interface ShortUrl {
   id: string;
@@ -17,11 +17,11 @@ export function createUrlApi(token: string) {
 
   return {
     list(): Promise<ShortUrl[]> {
-      return apiFetch(`${backendUrl}/urls`, { headers });
+      return apiFetch(urlApiBase, { headers });
     },
 
     create(originalUrl: string, customAlias?: string): Promise<ShortUrl> {
-      return apiFetch(`${backendUrl}/urls`, {
+      return apiFetch(urlApiBase, {
         method: "POST",
         headers,
         body: JSON.stringify({ originalUrl, customAlias: customAlias || null }),
@@ -29,7 +29,7 @@ export function createUrlApi(token: string) {
     },
 
     delete(id: string): Promise<void> {
-      return apiFetch(`${backendUrl}/urls/${id}`, {
+      return apiFetch(`${urlApiBase}/${id}`, {
         method: "DELETE",
         headers,
       });

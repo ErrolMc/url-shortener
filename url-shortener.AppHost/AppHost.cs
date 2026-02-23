@@ -1,6 +1,15 @@
+using Azure.Provisioning.CosmosDB;
+
 var builder = DistributedApplication.CreateBuilder(args);
 
 var cosmos = builder.AddAzureCosmosDB("cosmos")
+    .ConfigureInfrastructure(infra =>
+    {
+        var cosmosAccount = infra.GetProvisionableResources()
+            .OfType<CosmosDBAccount>()
+            .Single();
+        cosmosAccount.DisableLocalAuth = false;
+    })
     .RunAsEmulator(emulator => emulator
         .WithLifetime(ContainerLifetime.Persistent)
         .WithDataVolume("chatapp-cosmos-data"));
@@ -12,6 +21,7 @@ var nextAuthUrl = builder.Configuration["NextAuth:Url"] ?? "http://localhost:300
 var jwtSecret = builder.Configuration["Jwt:Secret"] ?? "";
 var extraCorsOrigins = builder.Configuration["Cors:ExtraOrigins"] ?? "";
 var urlDomain = builder.Configuration["UrlDomain"] ?? "";
+var backendPublicUrl = builder.Configuration["BackendPublicUrl"] ?? "";
 
 var backend = builder.AddProject<Projects.url_shortener_backend>("url-shortener-backend")
     .WithReference(cosmos)
@@ -31,7 +41,9 @@ var frontend = builder.AddJavaScriptApp("frontend", "../url-shortner.frontend", 
     .WithEnvironment("GOOGLE_CLIENT_SECRET", googleClientSecret)
     .WithEnvironment("NEXTAUTH_SECRET", nextAuthSecret)
     .WithEnvironment("NEXTAUTH_URL", nextAuthUrl)
-    .WithEnvironment("NEXT_PUBLIC_BACKEND_URL", backend.GetEndpoint("http"))
+    .WithEnvironment("NEXT_PUBLIC_BACKEND_URL", string.IsNullOrEmpty(backendPublicUrl)
+        ? ReferenceExpression.Create($"{backend.GetEndpoint("http")}")
+        : ReferenceExpression.Create($"{backendPublicUrl}"))
     .WithEnvironment("NEXT_PUBLIC_URL_DOMAIN", string.IsNullOrEmpty(urlDomain)
         ? ReferenceExpression.Create($"{backend.GetEndpoint("http")}")
         : ReferenceExpression.Create($"{urlDomain}"));

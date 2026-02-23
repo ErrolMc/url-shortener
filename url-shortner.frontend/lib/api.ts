@@ -1,4 +1,5 @@
-export const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:5112";
+// API calls go through Next.js proxy routes (app/api/urls/*) to avoid NEXT_PUBLIC build-time baking
+export const urlApiBase = "/api/urls";
 
 export async function apiFetch<T>(url: string, init: RequestInit): Promise<T> {
   const res = await fetch(url, init);

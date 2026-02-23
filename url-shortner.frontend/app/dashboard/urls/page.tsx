@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { createUrlApi, type ShortUrl } from "@/lib/urlApi";
 import { ApiError } from "@/lib/api";
@@ -8,15 +8,23 @@ import { ApiError } from "@/lib/api";
 export default function UrlsPage() {
   const { data: session, status } = useSession();
   const [urls, setUrls] = useState<ShortUrl[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [originalUrl, setOriginalUrl] = useState("");
   const [customAlias, setCustomAlias] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [urlDomain, setUrlDomain] = useState<string>("");
 
   const api = session?.backendToken ? createUrlApi(session.backendToken) : null;
+
+  useEffect(() => {
+    fetch("/api/config")
+      .then((r) => r.json())
+      .then((d) => setUrlDomain(d.urlDomain ?? ""))
+      .catch(() => {});
+  }, []);
 
   const fetchUrls = useCallback(async () => {
     if (!api) return;
@@ -68,8 +76,6 @@ export default function UrlsPage() {
       setDeletingId(null);
     }
   };
-
-  const urlDomain = process.env.NEXT_PUBLIC_URL_DOMAIN;
 
   const getShortUrl = (shortCode: string) =>
     `${urlDomain}/${shortCode}`;
